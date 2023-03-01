@@ -86,11 +86,24 @@ public class Application {
                 .verificationCode(verificationCode)
                 .gender(Gender.valueOf(gender))
                 .build());
-        userHome();
         new Thread(()-> mailSender.sendMessage(currentUser.getEmail(), "Account verification",
                 String.format("Welcom doctor_patient application. Your verification code: %s", verificationCode)))
                 .start();
+        System.out.println("Account successfully created: Input email code to verify your account");
+        String code =  scanner.nextLine();
+        if(verificationCode.equalsIgnoreCase(code)){
+            System.out.println("Account verified. )");
+            goToUserPage();
+        }else {
+            System.out.println("Invalid code");
+            welcomePage();
+        }
 
+
+    }
+
+    private void goToUserPage() {
+        System.out.println("user paghe");
     }
 
     private UserType userTypeInitialization() {
@@ -142,18 +155,55 @@ public class Application {
         if (currentUser == null) {
             System.out.println("Incorrect email or password");
             start();
-        } else {
+        } else if(!currentUser.isVerified()){
+            goToVerification(currentUser);
+        }else {
             this.currentUser = currentUser;
             userHome();
 
         }
     }
 
+    private void goToVerification(User currentUser) {
+        System.out.println("Your account is not verified. Do you wont to verify. (Y|N)");
+        String command =  scanner.nextLine();
+        if("y".equalsIgnoreCase(command)){
+            System.out.println("Input your verification code");
+            String verificationCode = scanner.nextLine();
+            if(verificationCode.equalsIgnoreCase(currentUser.getVerificationCode())){
+
+                currentUser.setVerificationCode(null);
+                userManager.verify(currentUser);
+                this.currentUser = currentUser;
+                userHome();
+
+            }
+            else{
+                System.out.println("Verification failed.");
+                start();
+            }
+        }
+        else{
+            start();
+        }
+    }
+
     private void userHome() {
+        if(currentUser.getType().equals(UserType.DOCTOR)){
+            doctorHome();
+        }
+        else if (currentUser.getType().equals(UserType.PATIENT)){
+            patientHome();
+        }
+        else if (currentUser.getType().equals(UserType.ADMIN)){
+            patientHome();
+        }
+    }
+
+    private void doctorHome(){
         System.out.println("For logout press 1");
-        System.out.println("For add new book press 2");
-        System.out.println("For vew my books press 3");
-        System.out.println("For vew all books press 4");
+        System.out.println("For see requests 2");
+        System.out.println("For manage work time 3");
         String command = scanner.nextLine();
         switch (command) {
             case "1": {
@@ -161,15 +211,40 @@ public class Application {
                 start();
             }
             case "2": {
-//                addNewBook();
+                showRequestsForDoctor();
                 break;
             }
             case "3": {
-//                booksByAuthor(currentUser);
+                manageWorkTime();
+                break;
+            }
+        }
+    }
+
+    private void showRequestsForDoctor() {
+
+    }
+
+    private void patientHome(){
+        System.out.println("For logout press 1");
+        System.out.println("For see requests 2");
+        System.out.println("For doctors view 3");
+        String command = scanner.nextLine();
+        switch (command) {
+            case "1": {
+                currentUser = null;
+                start();
+            }
+            case "2": {
+//
+                break;
+            }
+            case "3": {
+//
                 break;
             }
             case "4": {
-//                allBooks();
+//
                 break;
             }
         }

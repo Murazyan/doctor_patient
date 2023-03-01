@@ -16,6 +16,8 @@ public class MailSender {
     Properties properties ;
     public MailSender(){
          properties = AppUtil.loadProperties();
+//         properties.setProperty("mail.smtp.user", "java.course.basic@gmail.com");
+//         properties.setProperty("mail.smtp.password", "klompzowtevergvx");
     }
 
     @SneakyThrows
@@ -24,7 +26,7 @@ public class MailSender {
         Session session = Session.getDefaultInstance(properties,
                 new javax.mail.Authenticator() {
                     protected PasswordAuthentication getPasswordAuthentication() {
-                        return new PasswordAuthentication(properties.getProperty("mail.smtp.userName"), properties.getProperty("mail.smtp.password"));
+                        return new PasswordAuthentication(/*properties.getProperty("mail.smtp.userName")*/"java.course.basic@gmail.com", properties.getProperty("mail.smtp.password"));
                     }
                 });
 

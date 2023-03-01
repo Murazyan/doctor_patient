@@ -10,11 +10,11 @@ import java.util.Properties;
 
 public class Main {
     public static void main(String[] args) {
-//        initDb();
-//        Application application = new Application();
-//        application.start();
-        MailSender mailSender = new MailSender();
-        mailSender.sendMessage("murazyan.margarita@gmail.com", "Account verification", "xxxxx");
+        initDb();
+        Application application = new Application();
+        application.start();
+//        MailSender mailSender = new MailSender();
+//        mailSender.sendMessage("murazyan.margarita@gmail.com", "Account verification", "xxxxx");
     }
 
     @SneakyThrows

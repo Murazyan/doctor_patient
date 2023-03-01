@@ -27,7 +27,7 @@ public class UserManagerImpl implements UserManager {
     @SneakyThrows
     public User save(User user) {
         PreparedStatement preparedStatement = null;
-        String query = "INSERT INTO users (name, surname, email, password, birth_date, gender, type, created_at) VALUES (?,?,?,?,?,?,?,?)";
+        String query = "INSERT INTO users (name, surname, email, password, birth_date, gender, type, created_at, verification_code) VALUES (?,?,?,?,?,?,?,?,?)";
         try {
 
             preparedStatement = provider.getConnection().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
@@ -39,6 +39,7 @@ public class UserManagerImpl implements UserManager {
             preparedStatement.setString(6, user.getGender().name());
             preparedStatement.setString(7, user.getType().name());
             preparedStatement.setTimestamp(8, new Timestamp(new  java.util.Date().getTime()));
+            preparedStatement.setString(9, user.getVerificationCode());
             preparedStatement.executeUpdate();
 
             try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
@@ -105,4 +106,19 @@ public class UserManagerImpl implements UserManager {
             System.out.println(e.getMessage());
         }
     }
+
+    @Override
+    public void verify(User user) {
+        String query = "UPDATE users SET verification_code = ? WHERE id = ?";
+        try {
+            PreparedStatement preparedStatement = provider.getConnection().prepareStatement(query);
+            preparedStatement.setString(1, user.getVerificationCode());
+            preparedStatement.setInt(2, user.getId());
+            preparedStatement.executeUpdate();
+            System.out.println("Verified!!!!!!!");
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
 }

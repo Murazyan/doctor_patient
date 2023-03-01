@@ -27,7 +27,7 @@ public class User extends BaseModel{
     private String verificationCode;
 
     public boolean isVerified(){
-        return this.verificationCode== null;
+        return this.verificationCode == null;
     }
 
 
