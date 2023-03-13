@@ -84,7 +84,7 @@ public class Application {
                 .password(password)
                 .type(type)
                 .verificationCode(verificationCode)
-                .gender(Gender.valueOf(gender))
+//                .gender(Gender.valueOf(gender))
                 .build());
         new Thread(()-> mailSender.sendMessage(currentUser.getEmail(), "Account verification",
                 String.format("Welcom doctor_patient application. Your verification code: %s", verificationCode)))
@@ -215,7 +215,7 @@ public class Application {
                 break;
             }
             case "3": {
-                manageWorkTime();
+//                manageWorkTime();
                 break;
             }
         }

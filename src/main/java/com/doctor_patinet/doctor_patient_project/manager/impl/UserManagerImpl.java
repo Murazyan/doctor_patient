@@ -36,7 +36,7 @@ public class UserManagerImpl implements UserManager {
             preparedStatement.setString(3, user.getEmail());
             preparedStatement.setString(4, user.getPassword());
             preparedStatement.setDate(5, new java.sql.Date(user.getBirthDate().getTime()));
-            preparedStatement.setString(6, user.getGender().name());
+//            preparedStatement.setString(6, user.getGender().name());
             preparedStatement.setString(7, user.getType().name());
             preparedStatement.setTimestamp(8, new Timestamp(new  java.util.Date().getTime()));
             preparedStatement.setString(9, user.getVerificationCode());
@@ -98,7 +98,7 @@ public class UserManagerImpl implements UserManager {
             preparedStatement.setString(1, user.getName());
             preparedStatement.setString(2, user.getSurname());
 //            preparedStatement.setInt(3, user.getAge());
-            preparedStatement.setString(4, user.getGender().name());
+//            preparedStatement.setString(4, user.getGender().name());
             preparedStatement.setInt(5, user.getId());
             preparedStatement.executeUpdate();
             System.out.println("Record is updated in the books table!");

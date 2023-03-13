@@ -22,7 +22,7 @@ public class UserMapper implements Function<ResultSet, User> {
         user.setEmail(resultSet.getString("email"));
         user.setVerificationCode(resultSet.getString("verification_code"));
         user.setBirthDate(resultSet.getDate("birth_date"));
-        user.setGender(Gender.valueOf(resultSet.getString("gender")));
+//        user.setGender(Gender.valueOf(resultSet.getString("gender")));
         user.setType(UserType.valueOf(resultSet.getString("type")));
         try {
 
