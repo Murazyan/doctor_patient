@@ -14,7 +14,5 @@ public interface UserManager {
 
     User getById(int id);
 
-    void update(User user);
-
     void verify(User user);
 }

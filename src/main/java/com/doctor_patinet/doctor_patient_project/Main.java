@@ -1,5 +1,6 @@
 package com.doctor_patinet.doctor_patient_project;
 
+import com.doctor_patinet.doctor_patient_project.manager.impl.UserManagerImpl;
 import com.doctor_patinet.doctor_patient_project.models.Doctor;
 import com.doctor_patinet.doctor_patient_project.models.Patient;
 import com.doctor_patinet.doctor_patient_project.models.Request;
@@ -16,50 +17,60 @@ import org.hibernate.Session;
 
 import javax.print.Doc;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
 public class Main {
     public static void main(String[] args) {
-        System.err.println("xxxxx");
+        UserManagerImpl userManager = new UserManagerImpl();
+//        boolean b = userManager.existByEmail("ardfdsfeg@gmail.com");
+//        System.out.println(b);
+//        System.err.println("xxxxx");
         Session session = HibernateUtil.getSessionFactory().openSession();
-        Doctor areg = Doctor.builder()
-                .name("Margarita")
-                .surname("Murazyan")
-                .email("areg@gmail.com")
-                .password("123")
-                .type(UserType.DOCTOR)
-                .build();
-        Integer aregId = (Integer) session.save(areg);
-        areg.setId(aregId);
-
-//        session.beginTransaction();
+//        Patient patient = session.get(Patient.class, 11);
+//        patient.setRequests(new ArrayList<>());
+//        session.saveOrUpdate(patient);
+//        Session session = HibernateUtil.getSessionFactory().openSession();
+//        Doctor areg = Doctor.builder()
+//                .name("Margarita")
+//                .surname("Murazyan")
+//                .email("areg@gmail.com")
+//                .password("123")
+//                .type(UserType.DOCTOR)
+//                .build();
+//        Integer aregId = (Integer) session.save(areg);
+//        areg.setId(aregId);
+//
+////        session.beginTransaction();
         Patient margarita = Patient.builder()
-                .name("Margarita")
-                .surname("Murazyan")
-                .email("maga@gmail.com")
-                .password("123")
-
-                .requests(List.of(Request.builder()
-                        .doctor( areg)
-                        .message("Message 1")
-                        .startDate(LocalDateTime.now())
-                        .endDate(LocalDateTime.now())
-                        .status(RequestStatus.WAITING)
-                        .build()))
+                .id(1)
+                .name("Poxos_1")
+                .surname("Poxosyan")
+                .email("maga3@gmail.com")
+                .password("145")
                 .type(UserType.PATIENT)
                 .build();
-
-
-
-
-//        session.beginTransaction();
-        Integer id = (Integer) session.save(margarita);
-//        session.flush();
-        session.close();
-        HibernateUtil.getSessionFactory().close();
+//        List<Request> request = List.of(Request.builder()
+//                .doctor(areg)
+//                .message("Message 1")
+//                .startDate(LocalDateTime.now())
+//                .patient(margarita)
+//                .endDate(LocalDateTime.now())
+//                .status(RequestStatus.WAITING)
+//                .build());
+//        margarita.setRequests(request);
+//
+//
+////        session.beginTransaction();
+        session.beginTransaction();
+        session.saveOrUpdate(margarita);
+        session.getTransaction().commit();
+////        session.flush();
+//        session.close();
+//        HibernateUtil.getSessionFactory().close();
 //        session.getTransaction().commit();
-        System.out.println("**** "+id);
+//        System.out.println("**** "+id);
 //        Integer petrosId = (Integer) session.save(petros);
 //        System.out.println("+++" + petrosId);
 //        poxos.setId(id);

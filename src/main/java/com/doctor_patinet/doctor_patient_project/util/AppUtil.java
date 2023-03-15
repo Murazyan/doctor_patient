@@ -26,7 +26,7 @@ public class AppUtil {
     public static Properties loadProperties(){
         Properties properties = new Properties();
         properties.load(new FileInputStream(
-                "C:\\Users\\Margarita_Murazyan\\Desktop\\second\\doctor_patient\\src\\main\\resources\\application.properties"));
+                "C:\\MARGARITA_MURAZYAN\\second\\doctor_patient\\src\\main\\resources\\application.properties"));
         return properties;
     }
 }

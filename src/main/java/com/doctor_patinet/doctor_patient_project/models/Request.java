@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Table(name = "requests")
 public class Request extends BaseModel{
 
-    @ManyToOne()
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name="patient_id", nullable=false)
     private Patient patient;
 

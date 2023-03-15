@@ -3,9 +3,7 @@ package com.doctor_patinet.doctor_patient_project.models;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.List;
 
 @Setter
@@ -17,7 +15,7 @@ import java.util.List;
 public class Patient extends User {
 
 
-    @OneToMany(mappedBy = "patient")
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Request> requests;
 
     public Patient(User user,
