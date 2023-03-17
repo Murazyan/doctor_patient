@@ -3,32 +3,51 @@ package com.doctor_patinet.doctor_patient_project.manager.impl;
 import com.doctor_patinet.doctor_patient_project.manager.RequestManager;
 import com.doctor_patinet.doctor_patient_project.models.Request;
 import com.doctor_patinet.doctor_patient_project.models.User;
-import com.doctor_patinet.doctor_patient_project.provider.DBConnectionProvider;
+import com.doctor_patinet.doctor_patient_project.models.enums.RequestStatus;
+import com.doctor_patinet.doctor_patient_project.util.HibernateUtil;
 import lombok.SneakyThrows;
+import org.hibernate.Session;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.Date;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class RequestManagerImpl implements RequestManager {
-    private final DBConnectionProvider provider = DBConnectionProvider.getInstance();
 
     @Override
     @SneakyThrows
     public List<Request> dailyRequestsPerDoctor(User doctor) {
-        List<Request> requests =  new ArrayList<>();
-        String query = "SELECT * from requests r " +
-                "INNER JOIN users u ON u.id = r.`patient_id` WHERE r.doctor_id = ? and r.start_date >= ?";
-        PreparedStatement statement = provider.getConnection().prepareStatement(query);
-        statement.setInt(1, doctor.getId());
-        statement.setDate(2, new java.sql.Date(new Date().getTime()));
-        ResultSet resultSet = statement.executeQuery();
-        while (resultSet.next()){
- //todo
-        }
-        return requests;
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<Request> cq = cb.createQuery(Request.class);
+        Root<Request> root = cq.from(Request.class);
+        cq.select(root).where(
+                cb.and(cb.equal(root.get("doctor"), doctor),
+                        cb.greaterThanOrEqualTo(root.get("startDate"), LocalDateTime.now().withHour(0).withMinute(0)),
+                        cb.lessThanOrEqualTo(root.get("endDate"), LocalDateTime.now().withHour(23).withMinute(59))
+                        )
+        );
+        return session.createQuery(cq).getResultList();
+    }
+    @Override
+    @SneakyThrows
+    public List<Request> dailyRequestsPerDoctorByStatus(User doctor,
+                                                        RequestStatus status) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<Request> cq = cb.createQuery(Request.class);
+        Root<Request> root = cq.from(Request.class);
+        cq.select(root).where(
+                cb.and(
+                        cb.equal(root.get("doctor"), doctor),
+                        cb.equal(root.get("status"), status),
+                        cb.greaterThanOrEqualTo(root.get("startDate"), LocalDateTime.now().withHour(0).withMinute(0)),
+                        cb.lessThanOrEqualTo(root.get("endDate"), LocalDateTime.now().withHour(23).withMinute(59))
+                        )
+        );
+        return session.createQuery(cq).getResultList();
     }
 
     @Override

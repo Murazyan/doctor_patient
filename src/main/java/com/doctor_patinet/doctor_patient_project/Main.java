@@ -23,11 +23,16 @@ import java.util.Properties;
 
 public class Main {
     public static void main(String[] args) {
-        UserManagerImpl userManager = new UserManagerImpl();
+
+        Application application=  new Application();
+        application.start();
+
+
+//        UserManagerImpl userManager = new UserManagerImpl();
 //        boolean b = userManager.existByEmail("ardfdsfeg@gmail.com");
 //        System.out.println(b);
 //        System.err.println("xxxxx");
-        Session session = HibernateUtil.getSessionFactory().openSession();
+//        Session session = HibernateUtil.getSessionFactory().openSession();
 //        Patient patient = session.get(Patient.class, 11);
 //        patient.setRequests(new ArrayList<>());
 //        session.saveOrUpdate(patient);
@@ -43,14 +48,14 @@ public class Main {
 //        areg.setId(aregId);
 //
 ////        session.beginTransaction();
-        Patient margarita = Patient.builder()
-                .id(1)
-                .name("Poxos_1")
-                .surname("Poxosyan")
-                .email("maga3@gmail.com")
-                .password("145")
-                .type(UserType.PATIENT)
-                .build();
+//        Patient margarita = Patient.builder()
+//                .id(1)
+//                .name("Poxos_1")
+//                .surname("Poxosyan")
+//                .email("maga3@gmail.com")
+//                .password("145")
+//                .type(UserType.PATIENT)
+//                .build();
 //        List<Request> request = List.of(Request.builder()
 //                .doctor(areg)
 //                .message("Message 1")
@@ -63,9 +68,9 @@ public class Main {
 //
 //
 ////        session.beginTransaction();
-        session.beginTransaction();
-        session.saveOrUpdate(margarita);
-        session.getTransaction().commit();
+//        session.beginTransaction();
+//        session.saveOrUpdate(margarita);
+//        session.getTransaction().commit();
 ////        session.flush();
 //        session.close();
 //        HibernateUtil.getSessionFactory().close();

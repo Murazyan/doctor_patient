@@ -1,9 +1,10 @@
 package com.doctor_patinet.doctor_patient_project.manager.impl;
 
 import com.doctor_patinet.doctor_patient_project.manager.UserManager;
-import com.doctor_patinet.doctor_patient_project.mapper.UserMapper;
+import com.doctor_patinet.doctor_patient_project.models.Doctor;
+import com.doctor_patinet.doctor_patient_project.models.Patient;
 import com.doctor_patinet.doctor_patient_project.models.User;
-import com.doctor_patinet.doctor_patient_project.provider.DBConnectionProvider;
+import com.doctor_patinet.doctor_patient_project.models.enums.UserType;
 import com.doctor_patinet.doctor_patient_project.util.HibernateUtil;
 import lombok.SneakyThrows;
 import org.hibernate.Session;
@@ -12,8 +13,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
-import java.io.Serializable;
-import java.sql.*;
 
 public class UserManagerImpl implements UserManager {
 
@@ -37,13 +36,30 @@ public class UserManagerImpl implements UserManager {
     @SneakyThrows
     public User save(User user) {
         Session session = HibernateUtil.getSessionFactory().openSession();
-        if(user.getId()!=0){
-            Integer id = (Integer) session.save(user);
+        if (user.getId() == 0) {
+            Integer id = null;
+            if (user.getType() == UserType.DOCTOR) {
+                Doctor doctor = (Doctor) user;
+                id = (Integer) session.save(doctor);
+            }
+            if (user.getType() == UserType.PATIENT) {
+                Patient patient = (Patient) user;
+                id = (Integer) session.save(patient);
+            }
             user.setId(id);
             session.close();
-        }else {
+        } else {
             session.beginTransaction();
-            session.saveOrUpdate(user);
+            if (user.getType() == UserType.DOCTOR) {
+                Doctor doctor = (Doctor) user;
+                session.saveOrUpdate(doctor);
+                ;
+            }
+            if (user.getType() == UserType.PATIENT) {
+                Patient patient = (Patient) user;
+                session.saveOrUpdate(patient);
+            }
+            session.getTransaction().commit();
         }
         return user;
     }

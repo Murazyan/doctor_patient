@@ -15,14 +15,14 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 @Table(name = "requests")
-public class Request extends BaseModel{
+public class Request extends BaseModel {
 
     @ManyToOne(cascade = CascadeType.MERGE)
-    @JoinColumn(name="patient_id", nullable=false)
+    @JoinColumn(name = "patient_id", nullable = false)
     private Patient patient;
 
     @ManyToOne()
-    @JoinColumn(name="doctor_id", nullable=false)
+    @JoinColumn(name = "doctor_id", nullable = false)
     private Doctor doctor;
 
     @Column(name = "start_date", columnDefinition = "timestamp")
@@ -37,5 +37,18 @@ public class Request extends BaseModel{
     @Column
     @Enumerated(EnumType.STRING)
     private RequestStatus status;
+
+
+    public String toStringForDoctor() {
+        return String.format("Request id: %s, Patient name: %s, patient surname: %s ,message: %s, status: %s, startDate: %s, endDate: %s ",
+                this.id,
+                this.patient.getName(),
+                this.patient.getSurname(),
+                this.message,
+                this.status.name(),
+                this.startDate,
+                this.endDate);
+
+    }
 
 }

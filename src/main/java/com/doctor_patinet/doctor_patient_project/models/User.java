@@ -20,7 +20,7 @@ import java.util.List;
 @Entity
 @Table(name = "users")
 @Inheritance(strategy= InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name="type",discriminatorType=DiscriminatorType.STRING)
+@DiscriminatorColumn(name="type", discriminatorType=DiscriminatorType.STRING)
 //@DiscriminatorValue(value="employee")
 public class User extends BaseModel{
 
@@ -38,10 +38,10 @@ public class User extends BaseModel{
 
     @Column(name = "birth_date")
     private Date birthDate;
-//
-//    @Column(name = "gender")
-//    @Enumerated(value = EnumType.STRING)
-//    private Gender gender;
+
+    @Column(name = "gender")
+    @Enumerated(value = EnumType.STRING)
+    private Gender gender;
 
     @Column(name = "type", insertable = false, updatable = false)
     @Enumerated(value = EnumType.STRING)

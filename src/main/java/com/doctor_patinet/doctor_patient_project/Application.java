@@ -1,17 +1,25 @@
 package com.doctor_patinet.doctor_patient_project;
 
 
+import com.doctor_patinet.doctor_patient_project.manager.IntervalManager;
+import com.doctor_patinet.doctor_patient_project.manager.RequestManager;
 import com.doctor_patinet.doctor_patient_project.manager.UserManager;
+import com.doctor_patinet.doctor_patient_project.manager.impl.IntervalManagerImpl;
+import com.doctor_patinet.doctor_patient_project.manager.impl.RequestManagerImpl;
 import com.doctor_patinet.doctor_patient_project.manager.impl.UserManagerImpl;
-import com.doctor_patinet.doctor_patient_project.models.User;
+import com.doctor_patinet.doctor_patient_project.models.*;
 import com.doctor_patinet.doctor_patient_project.models.enums.Gender;
+import com.doctor_patinet.doctor_patient_project.models.enums.RequestStatus;
 import com.doctor_patinet.doctor_patient_project.models.enums.UserType;
 import com.doctor_patinet.doctor_patient_project.util.AppUtil;
 import com.doctor_patinet.doctor_patient_project.util.MailSender;
 
+import javax.print.Doc;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
@@ -24,9 +32,12 @@ public class Application {
     private final static Scanner scanner = new Scanner(System.in);
 
     private final UserManager userManager = new UserManagerImpl();
+    private final RequestManager requestManager = new RequestManagerImpl();
+    private final IntervalManager intervalManager = new IntervalManagerImpl();
     private final MailSender mailSender = new MailSender();
 
     private final DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
 
     private static final int VERIFICATION_TEXT_LENGTH = 5;
 
@@ -76,25 +87,38 @@ public class Application {
         UserType type = userTypeInitialization();
 
         String verificationCode = AppUtil.generateRandomString(VERIFICATION_TEXT_LENGTH);
-        currentUser = userManager.save(User.builder()
-                .name(name)
-                .surname(surname)
-                .birthDate(birthDate)
-                .email(email)
-                .password(password)
-                .type(type)
-                .verificationCode(verificationCode)
-//                .gender(Gender.valueOf(gender))
-                .build());
-        new Thread(()-> mailSender.sendMessage(currentUser.getEmail(), "Account verification",
-                String.format("Welcom doctor_patient application. Your verification code: %s", verificationCode)))
-                .start();
+        currentUser = type == UserType.DOCTOR ?
+
+
+                userManager.save(Doctor.builder()
+                        .name(name)
+                        .surname(surname)
+                        .birthDate(birthDate)
+                        .email(email)
+                        .password(password)
+                        .type(type)
+                        .verificationCode(verificationCode)
+                        .gender(Gender.valueOf(gender))
+                        .build()) :
+                userManager.save(Patient.builder()
+                        .name(name)
+                        .surname(surname)
+                        .birthDate(birthDate)
+                        .email(email)
+                        .password(password)
+                        .type(type)
+                        .verificationCode(verificationCode)
+                        .gender(Gender.valueOf(gender))
+                        .build());
+//        new Thread(() -> mailSender.sendMessage(currentUser.getEmail(), "Account verification",
+//                String.format("Welcome doctor_patient application. Your verification code: %s", verificationCode)))
+//                .start();
         System.out.println("Account successfully created: Input email code to verify your account");
-        String code =  scanner.nextLine();
-        if(verificationCode.equalsIgnoreCase(code)){
+        String code = scanner.nextLine();
+        if (verificationCode.equalsIgnoreCase(code)) {
             System.out.println("Account verified. )");
-            goToUserPage();
-        }else {
+            userHome();
+        } else {
             System.out.println("Invalid code");
             welcomePage();
         }
@@ -102,9 +126,6 @@ public class Application {
 
     }
 
-    private void goToUserPage() {
-        System.out.println("user paghe");
-    }
 
     private UserType userTypeInitialization() {
         UserType res = null;
@@ -155,9 +176,9 @@ public class Application {
         if (currentUser == null) {
             System.out.println("Incorrect email or password");
             start();
-        } else if(!currentUser.isVerified()){
+        } else if (!currentUser.isVerified()) {
             goToVerification(currentUser);
-        }else {
+        } else {
             this.currentUser = currentUser;
             userHome();
 
@@ -166,44 +187,41 @@ public class Application {
 
     private void goToVerification(User currentUser) {
         System.out.println("Your account is not verified. Do you wont to verify. (Y|N)");
-        String command =  scanner.nextLine();
-        if("y".equalsIgnoreCase(command)){
+        String command = scanner.nextLine();
+        if ("y".equalsIgnoreCase(command)) {
             System.out.println("Input your verification code");
             String verificationCode = scanner.nextLine();
-            if(verificationCode.equalsIgnoreCase(currentUser.getVerificationCode())){
+            if (verificationCode.equalsIgnoreCase(currentUser.getVerificationCode())) {
 
                 currentUser.setVerificationCode(null);
                 userManager.verify(currentUser);
                 this.currentUser = currentUser;
                 userHome();
 
-            }
-            else{
+            } else {
                 System.out.println("Verification failed.");
                 start();
             }
-        }
-        else{
+        } else {
             start();
         }
     }
 
     private void userHome() {
-        if(currentUser.getType().equals(UserType.DOCTOR)){
+        if (currentUser.getType().equals(UserType.DOCTOR)) {
             doctorHome();
-        }
-        else if (currentUser.getType().equals(UserType.PATIENT)){
+        } else if (currentUser.getType().equals(UserType.PATIENT)) {
             patientHome();
-        }
-        else if (currentUser.getType().equals(UserType.ADMIN)){
+        } else if (currentUser.getType().equals(UserType.ADMIN)) {
             patientHome();
         }
     }
 
-    private void doctorHome(){
+    private void doctorHome() {
         System.out.println("For logout press 1");
         System.out.println("For see requests 2");
-        System.out.println("For manage work time 3");
+        System.out.println("For see waiting requests 3");
+        System.out.println("For manage work time 4");
         String command = scanner.nextLine();
         switch (command) {
             case "1": {
@@ -214,18 +232,89 @@ public class Application {
                 showRequestsForDoctor();
                 break;
             }
+
             case "3": {
-//                manageWorkTime();
+                showWaitingRequestsForDoctor();
+                break;
+            }
+            case "4": {
+                manageWorkTime();
                 break;
             }
         }
     }
 
-    private void showRequestsForDoctor() {
+    private void manageWorkTime() {
+        boolean normalCommand = false;
+        while (!normalCommand) {
+            System.out.println("To see today's intervals press 1");
+            System.out.println("To add new interval press 2");
+            System.out.println("To change interval press 3");
+            System.out.println("To delete interval 4");
+            String command = scanner.nextLine();
+            switch (command) {
+                case "1" -> {
+                    normalCommand = true;
+                }
+                case "2" -> {
+                    addNewInterval(currentUser);
+                    normalCommand = true;
+                }
+                case "3" -> {
+                    normalCommand = true;
+                }
+                case "4" -> {
+                    normalCommand = true;
+
+                }
+                default -> System.out.println("Incorrect command");
+            }
+        }
+
 
     }
 
-    private void patientHome(){
+    private void addNewInterval(User currentUser) {
+
+        System.out.println("Input interval start with dd-MM-yyyy hh:mm format ");
+        String start = scanner.nextLine();
+
+        System.out.println("Input interval end with dd-MM-yyyy hh:mm format ");
+        String end = scanner.nextLine();
+
+        Interval savedInterval = intervalManager.save(Interval.builder()
+                .doctor((Doctor) currentUser)
+                .startDate(LocalDateTime.parse(start, dateTimeFormatter))
+                .endDate(LocalDateTime.parse(end, dateTimeFormatter))
+                .build());
+        System.out.println("Interval successfully created with id = " + savedInterval.getId());
+        doctorHome();
+
+    }
+
+    private void showRequestsForDoctor() {
+
+        List<Request> requests = requestManager.dailyRequestsPerDoctor(currentUser);
+        if (requests.isEmpty()) {
+            System.out.println("There is no request for today");
+        } else {
+            requests.forEach(request -> System.out.println(request.toStringForDoctor()));
+        }
+
+    }
+
+    private void showWaitingRequestsForDoctor() {
+
+        List<Request> requests = requestManager.dailyRequestsPerDoctorByStatus(currentUser, RequestStatus.WAITING);
+        if (requests.isEmpty()) {
+            System.out.println("There is no waiting request for today");
+        } else {
+            requests.forEach(request -> System.out.println(request.toStringForDoctor()));
+        }
+
+    }
+
+    private void patientHome() {
         System.out.println("For logout press 1");
         System.out.println("For see requests 2");
         System.out.println("For doctors view 3");
